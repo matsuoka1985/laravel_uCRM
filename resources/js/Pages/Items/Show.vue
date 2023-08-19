@@ -7,6 +7,7 @@ import { Inertia } from '@inertiajs/inertia';
 
 
 
+
 defineProps({
     item: Object
 });
