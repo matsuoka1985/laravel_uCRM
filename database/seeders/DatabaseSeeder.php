@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
         //そのコレクション型の型を配列に変更。
 
         //Purchaseテーブルに
-        Purchase::factory(100)->create()
+        Purchase::factory(30000)->create()
         ->each(function(Purchase $purchase)use ($items){
             $purchase->items()->attach(
                 $items->random(rand(1,3))->pluck('id')->toArray(), //
