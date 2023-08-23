@@ -1,53 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Models\Order;
+namespace App\Services;
 use Illuminate\Support\Facades\DB;
 
-class AnalysisController extends Controller
-{
-    public function index()
-    {
-        $startDate = '2022-08-01';
-        $endDate = '2022-08-31';
+class DecileService {
+    public static function decile($subQuery){
 
-        // $period=Order::betweenDate($startDate,$endDate)
-        // ->groupBy('id')
-        // ->selectRaw('id,sum(subtotal) as total, customer_name,status,created_at')
-        // ->orderBy('created_at')
-        // ->paginate(50);
-
-        // dd($period);
-
-        // $subQuery=Order::betweenDate($startDate,$endDate)
-        // ->where('status',true)
-        // ->groupBy('id')
-        // ->selectRaw('id, sum(subtotal) as totalPerPurchase,
-        // DATE_FORMAT(created_at,"%Y%m%d") as date
-        //  ');
-
-        // $data= DB::table($subQuery)
-        // ->groupBy('date')
-        // ->selectRaw('date, sum(totalPerPurchase) as total ')
-        // ->get();
-
-        // dd($data);
-
-
-        // dd($data);
-
-        return Inertia::render('Analysis');
-    }
-
-    public function decile(){
-
-        $startDate = '2022-08-01';
-        $endDate = '2022-08-31';
         // 1. 購買ID毎にまとめる
-        $subQuery = Order::betweenDate($startDate, $endDate)
+        $subQuery=$subQuery
             ->groupBy('id')
             ->selectRaw('id,customer_id,customer_name,SUM(subtotal) as totalPerPurchase');
         // dd($subQuery);
@@ -121,6 +81,11 @@ class AnalysisController extends Controller
         DB::statement("set @total=${total};");
         $data = DB::table($subQuery)
             ->selectRaw('decile,average,totalPerGroup,round(100*totalPerGroup/@total,1) as totalRatio ')->get();
+
+        $labels=$data->pluck('decile');
+        $totals=$data->pluck('totalPerGroup');
+
+        return [$data,$labels,$totals];
 
     }
 }
